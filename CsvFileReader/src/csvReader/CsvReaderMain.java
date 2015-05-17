@@ -1,7 +1,7 @@
 /**
  * CsvReaderMain.java
- * @version 3.00
- * @date 15.05.2015
+ * @version 3.01
+ * @date 17.05.2015
  */
 package csvReader;
 
@@ -21,7 +21,7 @@ import javax.swing.UnsupportedLookAndFeelException;
  * @author Sylwester Pijanowski
  */
 public class CsvReaderMain {
-
+	/** main app frame */
 	private static JFrame frame;
 	
 	/** 
@@ -30,31 +30,31 @@ public class CsvReaderMain {
 	 */
 	public static void main( String[] args ) {
 		
-		EventQueue.invokeLater( new Runnable(){
+		EventQueue.invokeLater( new Runnable() {
 			
 			public void run() {
 				frame = new CsvFrame();
 
 				try {
 					// set theme of frame to Nimbus
-					for (LookAndFeelInfo info : UIManager
-							.getInstalledLookAndFeels()) {
-						if ("Nimbus".equals( info.getName() )) {
+					for ( LookAndFeelInfo info : UIManager
+							.getInstalledLookAndFeels() ) {
+						if ( "Nimbus".equals( info.getName() ) ) {
 							UIManager.setLookAndFeel( info.getClassName() );
 							break;
 						}
 					}
 					SwingUtilities.updateComponentTreeUI( frame );
-				} catch (ClassNotFoundException | InstantiationException
+				} catch ( ClassNotFoundException | InstantiationException
 						| IllegalAccessException
-						| UnsupportedLookAndFeelException e) {
+						| UnsupportedLookAndFeelException e ) {
 					// if Nimbus not found return;
 					return;
 				}
 				// main settings of frame
 				ImageIcon iconImage = new ImageIcon( this.getClass()
 						.getResource( "/img/csv_icon.png" ) );
-				frame.setIconImage(iconImage.getImage());
+				frame.setIconImage( iconImage.getImage() );
 				frame.setTitle( "CsvReader Version 3.00" );
 				frame.setDefaultCloseOperation( JFrame.EXIT_ON_CLOSE );
 				frame.setVisible( true );

@@ -1,7 +1,7 @@
 /**
  * CompareCSV.java
- * @version 3.00
- * @date 15.05.2015
+ * @version 3.01
+ * @date 17.05.2015
  */
 package logic;
 
@@ -11,6 +11,7 @@ import javax.swing.JPanel;
 import javax.swing.JButton;
 import javax.swing.SwingUtilities;
 import javax.swing.GroupLayout;
+import javax.swing.SwingWorker;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -25,7 +26,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.awt.Font;
 import java.awt.Color;
-
 import java.io.File;
 import java.util.concurrent.TimeUnit;
 
@@ -60,10 +60,13 @@ public class CompareTwoCsv extends JPanel {
 	public static int f2;
 	public static int s2;
 	/** Combobox offiles to choose */
-	private JComboBox<String> firstFileFirstColumn = new JComboBox<String>();	
-	private JComboBox<String> firstFileSecondColumn = new JComboBox<String>();
-	private JComboBox<String> secondFileFirstColumn = new JComboBox<String>();
-	private JComboBox<String> secondFileSecondColumn = new JComboBox<String>();
+	private JComboBox< String > firstFileFirstColumn = new JComboBox< String >();	
+	private JComboBox< String > firstFileSecondColumn = new JComboBox< String >();
+	private JComboBox< String > secondFileFirstColumn = new JComboBox< String >();
+	private JComboBox< String > secondFileSecondColumn = new JComboBox< String >();
+	/** Used font*/
+	private Font usedFont = new Font( "Tahoma", Font.BOLD, 11 );
+	
 
 	/** create instance of CompareTwoCsv */
 	public CompareTwoCsv() {
@@ -71,133 +74,155 @@ public class CompareTwoCsv extends JPanel {
 		csvFirstFileChooser = new JFileChooser();
 		// Akceptowanie wyboru plików .csv
 		FileNameExtensionFilter filter = new FileNameExtensionFilter(
-				"Pliki CSV", "csv");
-		csvFirstFileChooser.setFileFilter(filter);
+				"Pliki CSV", "csv" );
+		csvFirstFileChooser.setFileFilter( filter );
 		
 		//create and add listener to accept button
-		final JButton okButton = new JButton("Ok");
-		okButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
+		final JButton okButton = new JButton( "Ok" );
+		okButton.addActionListener( new ActionListener() {
+			public void actionPerformed( ActionEvent arg0 ) {
 				ok = true;
-				dialog.setVisible(false);
-				SwingUtilities.updateComponentTreeUI(CsvReaderMain.getFrame());
+				dialog.setVisible( false );
+				SwingUtilities.updateComponentTreeUI( CsvReaderMain.getFrame() );
 			}
 		});
 		
 		// create cancel button
-		JButton btnNewButton_1 = new JButton("Cancel");
-		btnNewButton_1.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				dialog.setVisible(false);
+		JButton btnNewButton_1 = new JButton( "Cancel" );
+		btnNewButton_1.addActionListener( new ActionListener() {
+			public void actionPerformed( ActionEvent e ) {
+				dialog.setVisible( false );
 			}
 		});
 		
 		
-		JLabel lblNewLabel = new JLabel("Porównanie plików CSV");
-		lblNewLabel.setFont(lblNewLabel.getFont().deriveFont(
+		JLabel lblNewLabel = new JLabel( "Porównanie plików CSV" );
+		lblNewLabel.setFont( lblNewLabel.getFont().deriveFont (
 				lblNewLabel.getFont().getStyle() | Font.BOLD,
-				lblNewLabel.getFont().getSize() + 5f));
+				lblNewLabel.getFont().getSize() + 5f ));
 
-		JLabel label = new JLabel("Dane pierwszego pliku");
-		label.setFont(new Font("Tahoma", Font.BOLD, 11));
+		JLabel label = new JLabel( "Dane pierwszego pliku" );
+		label.setFont( usedFont );
 
-		JLabel label_1 = new JLabel("Dane drugiego pliku");
-		label_1.setFont(new Font("Tahoma", Font.BOLD, 11));
+		JLabel label_1 = new JLabel( "Dane drugiego pliku" );
+		label_1.setFont( usedFont );
 		// create panel and choose first File button
-		final JButton wybierz1 = new JButton("Wybierz pierwszy plik");
-		wybierz1.addActionListener(new ActionListener() {
+		final JButton wybierz1 = new JButton( "Wybierz pierwszy plik" );
+		wybierz1.addActionListener( new ActionListener() {
 
-			public void actionPerformed(ActionEvent event) {
-				csvFirstFileChooser.setCurrentDirectory(new File("."));
+			public void actionPerformed( ActionEvent event ) {
+				csvFirstFileChooser.setCurrentDirectory( new File( "." ) );
 				int result = csvFirstFileChooser
-						.showOpenDialog(CompareTwoCsv.this);
-				if (result == JFileChooser.APPROVE_OPTION) {
-					firstFile = new CsvFile(csvFirstFileChooser.getSelectedFile()
-							.getPath());
-					try {
-						while (!firstFile.isReading()) {
-							TimeUnit.MICROSECONDS.sleep(10);
-						}
-					} catch (InterruptedException e) {
-						System.out.println(e);
-					}
-					new Thread(new ComboBoxChanger(firstFileFirstColumn,
-							firstFile.getCsvFileFirstRow())).start();
-					firstFileFirstColumn
-							.addActionListener(new ActionListener() {
-								public void actionPerformed(ActionEvent e) {
-									f1 = firstFileFirstColumn
-											.getSelectedIndex();
-								}
-							});
+						.showOpenDialog( CompareTwoCsv.this );
+				if ( result == JFileChooser.APPROVE_OPTION ) {
+					SwingWorker< Void, Void > worker = new SwingWorker< Void, Void >() {
 
-					new Thread(new ComboBoxChanger(firstFileSecondColumn,
-							firstFile.getCsvFileFirstRow())).start();
-					firstFileSecondColumn
-							.addActionListener(new ActionListener() {
-								public void actionPerformed(ActionEvent e) {
-									s1 = firstFileSecondColumn
-											.getSelectedIndex();
+						@Override
+						protected Void doInBackground() throws Exception {
+							firstFile = new CsvFile( csvFirstFileChooser.getSelectedFile()
+									.getPath() );
+							try {
+								while ( !firstFile.isReady() ) {
+									TimeUnit.MICROSECONDS.sleep( 10 );
 								}
-							});
+							} catch ( InterruptedException e ) {
+								System.out.println( e );
+							}
+							new Thread(new ComboBoxChanger( firstFileFirstColumn,
+									firstFile.getCsvFileFirstRow() ) ).start();
+							firstFileFirstColumn
+									.addActionListener( new ActionListener() {
+										
+										public void actionPerformed( ActionEvent e ) {
+											f1 = firstFileFirstColumn
+													.getSelectedIndex();
+										}
+									});
+
+							new Thread( new ComboBoxChanger( firstFileSecondColumn,
+									firstFile.getCsvFileFirstRow() ) ).start();
+							firstFileSecondColumn
+									.addActionListener( new ActionListener() {
+										public void actionPerformed( ActionEvent e ) {
+											s1 = firstFileSecondColumn
+													.getSelectedIndex();
+										}
+									});
+							return null;
+						}
+						
+					};
+					worker.execute();
+
 				}
 			}
 		});
 		
 		// create second file button
-		final JButton wybierz2 = new JButton("Wybierz drugi plik");
-		wybierz2.addActionListener(new ActionListener() {
+		final JButton wybierz2 = new JButton( "Wybierz drugi plik" );
+		wybierz2.addActionListener( new ActionListener() {
 
-			public void actionPerformed(ActionEvent event) {
-				csvFirstFileChooser.setCurrentDirectory(new File("."));
+			public void actionPerformed( ActionEvent event ) {
+				csvFirstFileChooser.setCurrentDirectory( new File( "." ) );
 				int result = csvFirstFileChooser
-						.showOpenDialog(CompareTwoCsv.this);
-				if (result == JFileChooser.APPROVE_OPTION) {
-					secondFile = new CsvFile(csvFirstFileChooser.getSelectedFile()
-							.getPath());
-					try {
-						while (!secondFile.isReading()) {
-							TimeUnit.MICROSECONDS.sleep(10);
-						}
-					} catch (InterruptedException e) {
-						System.out.println(e);
-					}
+						.showOpenDialog( CompareTwoCsv.this );
+				if ( result == JFileChooser.APPROVE_OPTION ) {
+					SwingWorker< Void, Void > worker = new SwingWorker< Void, Void >() {
 
-					new Thread(new ComboBoxChanger(secondFileFirstColumn,
-							secondFile.getCsvFileFirstRow())).start();
-					secondFileFirstColumn
-							.addActionListener(new ActionListener() {
-								public void actionPerformed(ActionEvent e) {
-									f2 = secondFileFirstColumn
-											.getSelectedIndex();
+						@Override
+						protected Void doInBackground() {
+							
+							secondFile = new CsvFile( csvFirstFileChooser.getSelectedFile()
+									.getPath() );
+							try {
+								while ( !secondFile.isReady() ) {
+									TimeUnit.MICROSECONDS.sleep( 10 );
 								}
-							});
-					new Thread(new ComboBoxChanger(secondFileSecondColumn,
-							secondFile.getCsvFileFirstRow())).start();
-					secondFileSecondColumn
-							.addActionListener(new ActionListener() {
-								public void actionPerformed(ActionEvent e) {
-									s2 = secondFileSecondColumn
-											.getSelectedIndex();
-								}
-							});
+							} catch ( InterruptedException e ) {
+								System.out.println( e );
+							}
+
+							new Thread(new ComboBoxChanger( secondFileFirstColumn,
+									secondFile.getCsvFileFirstRow() ) ).start();
+							secondFileFirstColumn
+									.addActionListener( new ActionListener() {
+										public void actionPerformed( ActionEvent e ) {
+											f2 = secondFileFirstColumn
+													.getSelectedIndex();
+										}
+									});
+							new Thread( new ComboBoxChanger(secondFileSecondColumn,
+									secondFile.getCsvFileFirstRow() ) ).start();
+							secondFileSecondColumn
+									.addActionListener( new ActionListener() {
+										public void actionPerformed( ActionEvent e ) {
+											s2 = secondFileSecondColumn
+													.getSelectedIndex();
+										}
+									});
+							return null;
+						}
+						
+					};
+					worker.execute();
+
 				}
 			}
 		});
 
-		JLabel lblPierwszaKolumna = new JLabel("Pierwsza kolumna");
-		lblPierwszaKolumna.setFont(new Font("Tahoma", Font.ITALIC, 11));
+		JLabel lblPierwszaKolumna = new JLabel( "Pierwsza kolumna" );
+		lblPierwszaKolumna.setFont( usedFont );
 
-		JLabel label_2 = new JLabel("Pierwsza kolumna");
-		label_2.setFont(new Font("Tahoma", Font.ITALIC, 11));
+		JLabel label_2 = new JLabel( "Pierwsza kolumna" );
+		label_2.setFont( usedFont );
 
-		JLabel lblDrugaKolumna = new JLabel("Druga kolumna");
-		lblDrugaKolumna.setForeground(Color.RED);
-		lblDrugaKolumna.setFont(new Font("Tahoma", Font.ITALIC, 11));
+		JLabel lblDrugaKolumna = new JLabel( "Druga kolumna" );
+		lblDrugaKolumna.setForeground( Color.RED );
+		lblDrugaKolumna.setFont( usedFont);
 
-		JLabel label_3 = new JLabel("Druga kolumna");
-		label_3.setForeground(Color.RED);
-		label_3.setFont(new Font("Tahoma", Font.ITALIC, 11));
+		JLabel label_3 = new JLabel( "Druga kolumna" );
+		label_3.setForeground( Color.RED );
+		label_3.setFont( usedFont );
 
 		JSeparator separator = new JSeparator();
 		
@@ -420,23 +445,23 @@ public class CompareTwoCsv extends JPanel {
 	 * @param title
 	 * title of dialog frame
 	 */
-	public boolean showDialog(Component parent, String title) {
+	public boolean showDialog( Component parent, String title ) {
 		ok = false;
 		Frame owner = null;
-		if (parent instanceof Frame)
-			owner = (Frame) parent;
+		if ( parent instanceof Frame )
+			owner = ( Frame ) parent;
 		else
-			owner = (Frame) SwingUtilities.getAncestorOfClass(Frame.class,
+			owner = (Frame ) SwingUtilities.getAncestorOfClass( Frame.class,
 					parent);
-		if (dialog == null || dialog.getOwner() != owner) {
-			dialog = new JDialog(owner, true);
-			dialog.getContentPane().add(this);
-			dialog.getRootPane().setDefaultButton(okButton);
+		if ( dialog == null || dialog.getOwner() != owner ) {
+			dialog = new JDialog( owner, true );
+			dialog.getContentPane().add( this );
+			dialog.getRootPane().setDefaultButton( okButton );
 			dialog.pack();
 		}
-		dialog.setTitle(title);
+		dialog.setTitle( title );
 
-		dialog.setVisible(true);
+		dialog.setVisible( true );
 		return ok;
 	}// end showDialog()
 	

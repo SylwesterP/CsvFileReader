@@ -1,7 +1,7 @@
 /**
  * ReadFileThread.java
- * @version 3.00
- * @date 15.05.2015
+ * @version 3.01
+ * @date 17.05.2015
  */
 package logic;
 
@@ -35,7 +35,7 @@ public class ReadFileThread implements Runnable{
 	 * @param aFile - csv file used to create table model
 	 * @param aCsvInsert - app log
 	 */
-	public ReadFileThread(JButton aGen, CsvFile aFile, JTextArea aCsvInsert){
+	public ReadFileThread( JButton aGen, CsvFile aFile, JTextArea aCsvInsert ){
 		file = aFile;
 		gen = aGen;
 		csvInsert = aCsvInsert;
@@ -45,18 +45,18 @@ public class ReadFileThread implements Runnable{
 	 * Method used to generate Thread to read Files
 	 */
 	public void run() {
-			EventQueue.invokeLater(new Runnable() {
+			EventQueue.invokeLater( new Runnable() {
 				public void run() {
 
-					csvInsert.setForeground(new Color(0, 100, 0));
+					csvInsert.setForeground( new Color( 0, 100, 0 ) );
 					int wczyt = file.getCsvFileRows();
-					csvInsert.append("GOTOWE! Wczytano plik \""
+					csvInsert.append( "GOTOWE! Wczytano plik \""
 							+ file.getCsvFileName()
 							+ "\". Ilość wczytanych danych " + wczyt
-							+ " Rekordów;\r\n");
-					gen = GenerateTableModel.addButton("Generuj", file);
-					CsvReaderMain.getFrame().add(gen, BorderLayout.NORTH);
-					SwingUtilities.updateComponentTreeUI(CsvReaderMain.getFrame());
+							+ " Rekordów;\r\n" );
+					gen = GenerateTableModel.addButton( "Generuj", file );
+					CsvReaderMain.getFrame().add( gen, BorderLayout.NORTH );
+					SwingUtilities.updateComponentTreeUI( CsvReaderMain.getFrame() );
 					
 				}
 			});

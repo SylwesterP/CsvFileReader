@@ -1,7 +1,7 @@
 /**
  * TableRowNumber.java
- * @version 3.00
- * @date 15.05.2015
+ * @version 3.01
+ * @date 17.05.2015
  */
 package gui;
 
@@ -26,21 +26,21 @@ public class TableRowNumber extends JTable {
 	 * 
 	 * @param table - mainTable used
 	 */
-	public TableRowNumber(JTable table) {
+	public TableRowNumber( JTable table ) {
 		// main setings of JTable
 		super();
 		mainTable = table;
-		setAutoCreateColumnsFromModel(false);
-		setModel(mainTable.getModel());
-		setSelectionModel(mainTable.getSelectionModel());
-		setAutoscrolls(false);
+		setAutoCreateColumnsFromModel( false );
+		setModel( mainTable.getModel() );
+		setSelectionModel( mainTable.getSelectionModel() );
+		setAutoscrolls( false );
 
 		// Create new TableColumn and add it to used Table
-		addColumn(new TableColumn());
-		getColumnModel().getColumn(0).setCellRenderer(
-				mainTable.getTableHeader().getDefaultRenderer());
-		getColumnModel().getColumn(0).setPreferredWidth(60);
-		setPreferredScrollableViewportSize(getPreferredSize());
+		addColumn( new TableColumn() );
+		getColumnModel().getColumn( 0 ).setCellRenderer(
+				mainTable.getTableHeader().getDefaultRenderer() );
+		getColumnModel().getColumn( 0 ).setPreferredWidth( 60 );
+		setPreferredScrollableViewportSize( getPreferredSize() );
 	}// end TableRowNumber()
 
 	/**
@@ -48,7 +48,7 @@ public class TableRowNumber extends JTable {
 	 * @return false - always;
 	 */
 	@Override
-	public boolean isCellEditable(int row, int column) {
+	public boolean isCellEditable( int row, int column ) {
 		return false;
 	}// end isCellEditable()
 
@@ -57,8 +57,8 @@ public class TableRowNumber extends JTable {
 	 * @return new column number
 	 */
 	@Override
-	public Object getValueAt(int row, int column) {
-		return new Integer(row + 1);
+	public Object getValueAt( int row, int column ) {
+		return new Integer( row + 1 );
 	}// end getValueAt()
 
 	/**
@@ -66,7 +66,7 @@ public class TableRowNumber extends JTable {
 	 * @return row height of assign row
 	 */
 	@Override
-	public int getRowHeight(int row) {
+	public int getRowHeight( int row ) {
 		return mainTable.getRowHeight();
 	}// end getRowHeight()
 }

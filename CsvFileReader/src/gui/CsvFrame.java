@@ -1,7 +1,7 @@
 /**
  * CsvFrame.java
- * @version 3.00
- * @date 15.05.2015
+ * @version 3.01
+ * @date 17.05.2015
  */
 package gui;
 
@@ -40,55 +40,54 @@ public class CsvFrame extends JFrame implements Serializable {
 		
 		// Create menu bar and its items
 		JMenuBar mbar = new JMenuBar();
-		setJMenuBar(mbar);
-		JMenu insertMenu = new JMenu("Wczytaj Plik");
-		mbar.add(insertMenu);
+		setJMenuBar( mbar );
+		JMenu insertMenu = new JMenu( "Wczytaj Plik" );
+		mbar.add( insertMenu );
 
-		JMenuItem insertItem = new JMenuItem("Wczytaj Plik CSV");
-		insertItem.addActionListener(new ConnectAction());
-		insertMenu.add(insertItem);
+		JMenuItem insertItem = new JMenuItem( "Wczytaj Plik CSV" );
+		insertItem.addActionListener( new ConnectAction() );
+		insertMenu.add( insertItem );
 
-		JMenuItem compareItem = new JMenuItem("Porównaj Pliki CSV");
-		compareItem.addActionListener(new CompareListener());
-		insertMenu.add(compareItem);
+		JMenuItem compareItem = new JMenuItem( "Porównaj Pliki CSV" );
+		compareItem.addActionListener( new CompareListener() );
+		insertMenu.add( compareItem );
 
-		JMenuItem exitItem = new JMenuItem("Zamknij");
-		exitItem.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent event) {
-				System.exit(0);
+		JMenuItem exitItem = new JMenuItem( "Zamknij" );
+		exitItem.addActionListener( new ActionListener() {
+			public void actionPerformed( ActionEvent event ) {
+				System.exit( 0 );
 			}
 		});
-		insertMenu.add(exitItem);
+		insertMenu.add( exitItem );
 
-		JMenu advancedMenu = new JMenu("Zaawansowane");
-		mbar.add(advancedMenu);
+		JMenu advancedMenu = new JMenu( "Zaawansowane" );
+		mbar.add( advancedMenu );
 
 		JMenuItem advancedCompare = new JMenuItem(
-				"Porównywanie dwóch plików CSV");
-		advancedCompare.addActionListener(new TwoCsvCompareListener());
-		advancedMenu.add(advancedCompare);
+				"Porównywanie dwóch plików CSV" );
+		advancedCompare.addActionListener( new TwoCsvCompareListener() );
+		advancedMenu.add( advancedCompare );
 		
 		// create desktop of aplication
 		desktop = new JDesktopPane();
-		desktop.setBackground(new Color(176, 196, 222));
-		add(desktop, BorderLayout.CENTER);
+		desktop.setBackground (new Color( 176, 196, 222 ) );
+		add( desktop, BorderLayout.CENTER );
 		
 		// create app log
 		int TEXT_ROWS = 5;
 		int TEXT_COLUMNS = 90;
-		csvInsert = new JTextArea(TEXT_ROWS, TEXT_COLUMNS);
-		csvInsert.setEditable(false);
-		JScrollPane scroll = new JScrollPane(csvInsert);
+		csvInsert = new JTextArea( TEXT_ROWS, TEXT_COLUMNS );
+		csvInsert.setEditable( false );
+		JScrollPane scroll = new JScrollPane( csvInsert );
 		
 		//Create SplitPane between desktop and app log
-		JSplitPane innerPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT,
-				desktop, scroll);
-		
-		innerPane.setDividerLocation(300);
-		innerPane.setContinuousLayout(true);
-		innerPane.setOneTouchExpandable(true);
+		JSplitPane innerPane = new JSplitPane( JSplitPane.VERTICAL_SPLIT,
+				desktop, scroll );		
+		innerPane.setDividerLocation( 300 );
+		innerPane.setContinuousLayout( true );
+		innerPane.setOneTouchExpandable( true );
 		innerPane.updateUI();
-		add(innerPane, BorderLayout.CENTER);
+		add( innerPane, BorderLayout.CENTER );
 	}// end CsvFrame()
 	
 	/**
@@ -97,15 +96,15 @@ public class CsvFrame extends JFrame implements Serializable {
 	private class ConnectAction implements ActionListener {
 		JButton generateButton;
 		
-		public void actionPerformed(ActionEvent event) {
+		public void actionPerformed( ActionEvent event ) {
 			
 			//if null instance of dialog create new
-			if (dialog == null)
+			if ( dialog == null )
 				dialog = new CsvChooser();
-			if (dialog.showDialog(CsvFrame.this, "Wybierz Plik")) {
+			if ( dialog.showDialog( CsvFrame.this, "Wybierz Plik" ) ) {
 				CsvFile file = CsvChooser.file;
 				// create button to generate data from choose file
-				new Thread(new ReadFileThread(generateButton, file, csvInsert))
+				new Thread( new ReadFileThread( generateButton, file, csvInsert ) )
 						.start();
 			};
 		}

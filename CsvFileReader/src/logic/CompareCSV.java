@@ -1,7 +1,7 @@
 /**
  * CompareCSV.java
- * @version 3.00
- * @date 15.05.2015
+ * @version 3.01
+ * @date 17.05.2015
  */
 package logic;
 
@@ -76,106 +76,109 @@ public class CompareCSV extends JPanel {
 	public CompareCSV() {
 
 		// setLayout
-		setLayout(new BorderLayout());
+		setLayout( new BorderLayout() );
 		
 		// create panel for buttons
 		JPanel buttonPanel = new JPanel();
 		
 		// create and add listener to button to start compare 
-		okButton = new JButton("Ok");
-		okButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent event) {
+		okButton = new JButton( "Ok" );
+		okButton.addActionListener( new ActionListener() {
+			
+			public void actionPerformed( ActionEvent event ) {
+				
 				showDialog = true;
-				compareCsv.setVisible(false);
-				SwingUtilities.updateComponentTreeUI(CsvReaderMain.getFrame());
+				compareCsv.setVisible( false );
+				SwingUtilities.updateComponentTreeUI( CsvReaderMain.getFrame() );
 			}
 		});		
-		okButton.setEnabled(false);
+		okButton.setEnabled( false );
 		
 		// create and add listener to button to cancel and hide dialog 
-		JButton cancelButton = new JButton("Cancel");
-		cancelButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent event) {
-				compareCsv.setVisible(false);
+		JButton cancelButton = new JButton( "Cancel" );
+		cancelButton.addActionListener( new ActionListener() {
+			
+			public void actionPerformed( ActionEvent event ) {
+				compareCsv.setVisible( false );
 			}
 		});
-		buttonPanel.add(okButton);
-		buttonPanel.add(cancelButton);
-		add(buttonPanel, BorderLayout.SOUTH);
+		buttonPanel.add( okButton );
+		buttonPanel.add( cancelButton );
+		add( buttonPanel, BorderLayout.SOUTH );
 		
 		// create file chooser and add file filter
 		csvFirstFileChooser = new JFileChooser();
 		csvSecondFileChooser = new JFileChooser();
 		FileNameExtensionFilter filter = new FileNameExtensionFilter(
-				"Pliki CSV", "csv");
-		csvFirstFileChooser.setFileFilter(filter);
-		csvSecondFileChooser.setFileFilter(filter);
+				"Pliki CSV", "csv" );
+		csvFirstFileChooser.setFileFilter( filter );
+		csvSecondFileChooser.setFileFilter( filter );
 		
 		// create and add listener to button to choose first file
-		chooseFirstFile = new JButton("Wybierz pierwszy plik");
-		chooseFirstFile.addActionListener(new ActionListener() {
+		chooseFirstFile = new JButton( "Wybierz pierwszy plik" );
+		chooseFirstFile.addActionListener( new ActionListener() {
 
-			@SuppressWarnings({ "unchecked", "rawtypes" })
-			public void actionPerformed(ActionEvent event) {
+			@SuppressWarnings( { "unchecked", "rawtypes" } )
+			public void actionPerformed( ActionEvent event ) {
 				// clear old selection
-				setSelc(0);
-				setSelc2(0);
+				clearOldSelection();				
 				northPanel.removeAll();
 				northPanel.updateUI();
 				
 				// choose file 
-				csvFirstFileChooser.setCurrentDirectory(new File("."));
+				csvFirstFileChooser.setCurrentDirectory( new File( "." ) );
 				int result = csvFirstFileChooser
-						.showOpenDialog(CompareCSV.this);
-				if (result == JFileChooser.APPROVE_OPTION) {					
+						.showOpenDialog( CompareCSV.this );
+				if ( result == JFileChooser.APPROVE_OPTION ) {					
 					// creating new file is taking a lot of time,
 					// thats why is used in new thead using SwingWorker					
-					SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>() {
+					SwingWorker< Void, Void > worker = new SwingWorker< Void, Void >() {
 						@Override
 						protected Void doInBackground() throws Exception {
 
-							chooseSecondFile.setVisible(true);
-							chooseSecondFile.setEnabled(true);
-							chooseFirstFile.setEnabled(false);
+							chooseSecondFile.setVisible( true );
+							chooseSecondFile.setEnabled( true );
+							chooseFirstFile.setEnabled( false );
+							
 							// create first file as an Object
-							firstFile = new CsvFile(csvFirstFileChooser
-									.getSelectedFile().getPath());
+							firstFile = new CsvFile( csvFirstFileChooser
+									.getSelectedFile().getPath() );
 							try {
-								while (!firstFile.isReading()) {
-									TimeUnit.MICROSECONDS.sleep(10);
+								while ( !firstFile.isReading() ) {
+									TimeUnit.MICROSECONDS.sleep( 10 );
 								}
-							} catch (InterruptedException e) {
-								System.out.println(e);
+							} catch ( InterruptedException e ) {
+								System.out.println( e );
 							}
-							okButton.setEnabled(false);
+							okButton.setEnabled( false );
 
 							String[] dane = firstFile.getCsvFileFirstRow();
 							
 							//create JList to choose column to compare in first file
-							final JList abcd = new JList(dane);
-							abcd.setVisibleRowCount(4);
-							abcd.addListSelectionListener(new ListSelectionListener() {
+							final JList abcd = new JList( dane );
+							abcd.setVisibleRowCount( 4 );
+							abcd.addListSelectionListener( new ListSelectionListener() {
 								public void valueChanged(
-										ListSelectionEvent event) {
+										ListSelectionEvent event ) {
 									selc = abcd.getLeadSelectionIndex();
 									firstSelectedArrayInt = abcd
 											.getSelectedIndices();
 									;
 								}
 							});
-							northPanel.add(new JLabel(
-									"Dane pierwszego pliku do porównania"));
-							JScrollPane scroll = new JScrollPane(abcd);
-							northPanel.add(scroll);
-							add(northPanel, BorderLayout.NORTH);
+							northPanel.add( new JLabel(
+									"Dane pierwszego pliku do porównania" ) );
+							JScrollPane scroll = new JScrollPane( abcd );
+							northPanel.add( scroll );
+							add( northPanel, BorderLayout.NORTH );
 							return null;
 						}
 
 						protected void done() {
-							chooseFirstFile.setEnabled(true);
+							chooseFirstFile.setEnabled( true );
 							Toolkit.getDefaultToolkit().beep();
-							SwingUtilities.updateComponentTreeUI(northPanel);
-							SwingUtilities.updateComponentTreeUI(compareCsv);
+							SwingUtilities.updateComponentTreeUI( northPanel );
+							SwingUtilities.updateComponentTreeUI( compareCsv );
 
 						}
 					};// end SwingWorker()
@@ -185,47 +188,49 @@ public class CompareCSV extends JPanel {
 		});
 		
 		// create and add listener to button to choose second file
-		chooseSecondFile = new JButton("Wybierz drugi plik");
-		chooseSecondFile.addActionListener(new ActionListener() {
-			@SuppressWarnings({ "rawtypes", "unchecked" })
-			public void actionPerformed(ActionEvent event) {
+		chooseSecondFile = new JButton( "Wybierz drugi plik" );
+		chooseSecondFile.addActionListener( new ActionListener() {
+			@SuppressWarnings( { "rawtypes", "unchecked" } )
+			public void actionPerformed( ActionEvent event ) {
 				selc2 = -1;
 				northPanel.updateUI();
-				csvSecondFileChooser.setCurrentDirectory(new File("."));
+				csvSecondFileChooser.setCurrentDirectory( new File(".") );
 				int result = csvSecondFileChooser
-						.showOpenDialog(CompareCSV.this);
-				if (result == JFileChooser.APPROVE_OPTION) {
-					SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>() {
+						.showOpenDialog( CompareCSV.this );
+				if ( result == JFileChooser.APPROVE_OPTION ) {
+					SwingWorker< Void, Void > worker = new SwingWorker< Void, Void >() {
+						
 						@Override
 						protected Void doInBackground() throws Exception {
-							chooseSecondFile.setEnabled(false);
-							secondFile = new CsvFile(csvSecondFileChooser
-									.getSelectedFile().getPath());
+							chooseSecondFile.setEnabled( false );
+							secondFile = new CsvFile( csvSecondFileChooser
+									.getSelectedFile().getPath() );
 							try {
-								while (!secondFile.isReading()) {
+								while ( !secondFile.isReading()) {
 									TimeUnit.MICROSECONDS.sleep(10);
 								}
-							} catch (InterruptedException e) {
-								System.out.println(e);
+							} catch ( InterruptedException e ) {
+								System.out.println( e );
 							}
+							
 							String[] dane = secondFile.getCsvFileFirstRow();
 
-							final JList abcd = new JList(dane);
-							abcd.setVisibleRowCount(4);
-							abcd.addListSelectionListener(new ListSelectionListener() {
+							final JList abcd = new JList( dane );
+							abcd.setVisibleRowCount( 4 );
+							abcd.addListSelectionListener( new ListSelectionListener() {
 								public void valueChanged(
-										ListSelectionEvent event) {
-									setSelc2(abcd.getLeadSelectionIndex());
+										ListSelectionEvent event ) {
+									setSelc2( abcd.getLeadSelectionIndex() );
 									secondSelectedArrayInt = abcd
 											.getSelectedIndices();
 									;
 								}
 							});
-							northPanel.add(new JLabel(
-									"Dane Drugiego pliku do porównania"));
-							JScrollPane scroll = new JScrollPane(abcd);
-							northPanel.add(scroll);
-							add(northPanel, BorderLayout.NORTH);
+							northPanel.add( new JLabel(
+									"Dane Drugiego pliku do porównania" ) );
+							JScrollPane scroll = new JScrollPane( abcd );
+							northPanel.add( scroll );
+							add( northPanel, BorderLayout.NORTH );
 
 							return null;
 						}
@@ -233,10 +238,10 @@ public class CompareCSV extends JPanel {
 						@Override
 						protected void done() {
 							Toolkit.getDefaultToolkit().beep();
-							okButton.setEnabled(true);
-							SwingUtilities.updateComponentTreeUI(northPanel);
-							SwingUtilities.updateComponentTreeUI(compareCsv);
-							chooseSecondFile.setVisible(false);
+							okButton.setEnabled( true );
+							SwingUtilities.updateComponentTreeUI( northPanel );
+							SwingUtilities.updateComponentTreeUI( compareCsv );
+							chooseSecondFile.setVisible( false );
 						}
 					};
 					worker.execute();
@@ -247,23 +252,32 @@ public class CompareCSV extends JPanel {
 		});
 		JPanel panel = new JPanel();
 
-		panel.setLayout(new GridLayout(2, 2));
-		northPanel.setLayout(new GridLayout(2, 2));
+		panel.setLayout( new GridLayout( 2, 2 ) );
+		northPanel.setLayout( new GridLayout( 2, 2 ) );
 
-		panel.add(new JLabel("Wybierz Pierwszy plik:"));
-		panel.add(new JLabel("Wybierz Drugi plik:"));
-		panel.add(chooseFirstFile);
-		panel.add(chooseSecondFile);
-		add(panel, BorderLayout.CENTER);
+		panel.add( new JLabel( "Wybierz Pierwszy plik:" ) );
+		panel.add( new JLabel( "Wybierz Drugi plik:" ) );
+		panel.add( chooseFirstFile );
+		panel.add( chooseSecondFile );
+		add( panel, BorderLayout.CENTER );
 
 
 	}// end CompareCSV()
+	
+	/** 
+	 * Method used to clean old selected items
+	 */
+	private void clearOldSelection() {
+		int noItemSelected = 0;
+		setSelc( noItemSelected );
+		setSelc2( noItemSelected );		
+	}
 
 	/** 
 	 * Method used to set selected item index
 	 * @param i - set first selected file index 
 	 * */
-	public static void setSelc(int i) {
+	public static void setSelc( int i ) {
 		CompareCSV.selc = i;
 	}// end setSelc()
 	
@@ -281,24 +295,25 @@ public class CompareCSV extends JPanel {
 	 * @param title - name of dialog
 	 * @return false when creating new dialog  
 	 * */
-	public boolean showDialog(Component parent, String title) {
+	public boolean showDialog( Component parent, String title ) {
 		showDialog = false;
 		Frame owner = null;
+		
 		// parent must be instance of Frame
-		if (parent instanceof Frame)
-			owner = (Frame) parent;
+		if ( parent instanceof Frame )
+			owner = ( Frame ) parent;
 		else
-			owner = (Frame) SwingUtilities.getAncestorOfClass(Frame.class,
-					parent);
-		if (compareCsv == null || compareCsv.getOwner() != owner) {
-			compareCsv = new JDialog(owner, true);
-			compareCsv.add(this);
-			compareCsv.getRootPane().setDefaultButton(okButton);
+			owner = ( Frame ) SwingUtilities.getAncestorOfClass( Frame.class,
+					parent );
+		if ( compareCsv == null || compareCsv.getOwner() != owner ) {
+			compareCsv = new JDialog( owner, true );
+			compareCsv.add( this );
+			compareCsv.getRootPane().setDefaultButton( okButton );
 			compareCsv.pack();
 		}
-		compareCsv.setTitle(title);
-		compareCsv.setSize(500, 300);
-		compareCsv.setVisible(true);
+		compareCsv.setTitle( title );
+		compareCsv.setSize( 500, 300 );
+		compareCsv.setVisible( true );
 		return showDialog;
 	}// end showDialog()
 	
@@ -314,7 +329,7 @@ public class CompareCSV extends JPanel {
 	 * Method used to set selected item index
 	 * @param selc2 - set second selected file index 
 	 * */
-	public static void setSelc2(int selc2) {
+	public static void setSelc2( int selc2 ) {
 		CompareCSV.selc2 = selc2;
 	}// end setSelc2()
 
@@ -330,7 +345,7 @@ public class CompareCSV extends JPanel {
 	 * Method used to set selected item index
 	 * @param secondSelectedArrayInt - return second selected file index 
 	 */
-	public static void setSecondSelectedArrayInt(int[] secondSelectedArrayInt) {
+	public static void setSecondSelectedArrayInt( int[] secondSelectedArrayInt ) {
 		CompareCSV.secondSelectedArrayInt = secondSelectedArrayInt;
 	}// end setSecondSelectedArrayInt()
 	
@@ -346,7 +361,7 @@ public class CompareCSV extends JPanel {
 	 * Method used to set selected item index
 	 * @param secondSelectedArrayInt - return first selected file index 
 	 */
-	public static void setFirstSelectedArrayInt(int[] firstSelectedArrayInt) {
+	public static void setFirstSelectedArrayInt( int[] firstSelectedArrayInt ) {
 		CompareCSV.firstSelectedArrayInt = firstSelectedArrayInt;
 	}// end setFirstSelectedArrayInt()
 

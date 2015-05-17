@@ -1,7 +1,7 @@
 /**
  * ColorCellRenderer.java
- * @version 3.00
- * @date 15.05.2015
+ * @version 3.01
+ * @date 17.05.2015
  */
 package gui;
 
@@ -29,10 +29,12 @@ public class ColorCellRenderer extends DefaultTableCellRenderer {
 	 *  @return comp - the colored component assign to the cell at [row, column]
 	 */
     @Override
-    public Component getTableCellRendererComponent( JTable table, Object val, boolean selected, boolean focused, int row, int col ) {
+    public Component getTableCellRendererComponent( JTable table, Object val, boolean selected, 
+    		boolean focused, int row, int col ) {
        
     	// get component assign to the cell at [row, column]
-    	Component comp = super.getTableCellRendererComponent( table, val, selected, focused, row, col );
+    	Component comp = super.getTableCellRendererComponent( table, val, selected, 
+    			focused, row, col );
     	
         // set component color assign to the cell at [row, column]
     	if( selected == false ) {

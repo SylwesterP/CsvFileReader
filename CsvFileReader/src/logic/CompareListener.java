@@ -1,7 +1,7 @@
 /**
  * CompareCSV.java
- * @version 3.00
- * @date 15.05.2015
+ * @version 3.01
+ * @date 17.05.2015
  */
 package logic;
 
@@ -38,12 +38,12 @@ public class CompareListener implements ActionListener {
 	/** 
 	 * Method used to compare files 
 	 */
-	public void actionPerformed(ActionEvent event) {
+	public void actionPerformed( ActionEvent event ) {
 		
-		if (compareCsv == null)
+		if ( compareCsv == null )
 			compareCsv = new CompareCSV();
-		if (compareCsv.showDialog(CsvReaderMain.getFrame(),
-				"Porównaj dwa pliki CSV")) {
+		if ( compareCsv.showDialog( CsvReaderMain.getFrame(),
+				"Porównaj dwa pliki CSV" ) ) {
 			// get files to compare
 			final CsvFile firstFile = CompareCSV.firstFile;
 			final CsvFile secondFile = CompareCSV.secondFile;
@@ -54,12 +54,12 @@ public class CompareListener implements ActionListener {
 			// geting indexs of columns to compare
 			int firstFileColumnNr;
 			int secondFileColumnNr;
-			if (CompareCSV.firstSelectedArrayInt == null) {
+			if ( CompareCSV.firstSelectedArrayInt == null ) {
 				firstFileColumnNr = 0;
 			} else {
 				firstFileColumnNr = CompareCSV.firstSelectedArrayInt[0];
 			}
-			if (CompareCSV.secondSelectedArrayInt == null) {
+			if ( CompareCSV.secondSelectedArrayInt == null ) {
 				secondFileColumnNr = 0;
 			} else {
 				secondFileColumnNr = CompareCSV.secondSelectedArrayInt[0];
@@ -68,16 +68,17 @@ public class CompareListener implements ActionListener {
 			final int secondFileColumn = secondFileColumnNr;
 			
 			//Start new thread to create table model
-			generateThread = new Thread(new Runnable() {
+			generateThread = new Thread( new Runnable() {
+				
 				public void run() {
 					//search for double data
 					String[][] newTableModel = inform.searchForDoubleData(
 							firstFile, secondFile, firstFileColumn,
-							secondFileColumn);
-					while (!inform.isDoneCompare()) {
+							secondFileColumn );
+					while ( !inform.isDoneCompare() ) {
 						try {
-							TimeUnit.MICROSECONDS.sleep(10);
-						} catch (InterruptedException e) {
+							TimeUnit.MICROSECONDS.sleep( 10 );
+						} catch ( InterruptedException e ) {
 							e.printStackTrace();
 						}
 					}
@@ -87,13 +88,13 @@ public class CompareListener implements ActionListener {
 					
 					//remove double data in final file
 					String[][] removedInnerDoubleData = null;
-					if (!newTableModel[0][0]
-							.equals("Brak Danych do wyświetlenia")) {
+					if ( !newTableModel[ 0 ][ 0 ]
+							.equals( "Brak Danych do wyświetlenia" ) ) {
 						removedInnerDoubleData = inform.removeDoubleData(
-								newTableModel, true);
+								newTableModel, true );
 						while (!inform.isDoneRemoveInnerDoubleData()) {
 							try {
-								TimeUnit.MICROSECONDS.sleep(10);
+								TimeUnit.MICROSECONDS.sleep( 10 );
 							} catch (InterruptedException e) {
 								e.printStackTrace();
 							}
@@ -102,8 +103,8 @@ public class CompareListener implements ActionListener {
 						removedInnerDoubleData = newTableModel;
 
 					}
-					if (removedInnerDoubleData[0][0]
-							.equals("Brak Danych do wyświetlenia")) {
+					if ( removedInnerDoubleData[ 0 ][ 0 ]
+							.equals( "Brak Danych do wyświetlenia" ) ) {
 						// if selected file are the same its show dialog 
 						inne = 0;
 						CsvFrame.getCsvInsert().setForeground(
@@ -114,31 +115,32 @@ public class CompareListener implements ActionListener {
 								firstFile.getCsvFileName(),
 								secondFile.getCsvFileName(),
 								removedInnerDoubleData,
-								firstFile.getCsvFileFirstRow());
+								firstFile.getCsvFileFirstRow() );
 
-						CsvReaderMain.getFrame().add(generateButton, BorderLayout.NORTH);
-						SwingUtilities.updateComponentTreeUI(CsvReaderMain
-								.getFrame());
+						CsvReaderMain.getFrame().add( generateButton, BorderLayout.NORTH );
+						SwingUtilities.updateComponentTreeUI( CsvReaderMain
+								.getFrame() );
 
 					}
 					else{
-						CsvFrame.getCsvInsert().setForeground(new Color(0, 100, 0));
+						CsvFrame.getCsvInsert().setForeground( new Color( 0, 100, 0 ) );
 						CsvFrame.getCsvInsert()
-								.append("Niepowtarzające: "
+								.append( "Niepowtarzające: "
 										+ inne
 										+ "; Powtarzające się: "
 										+ pow1
-										+ "\r\nUsunięto powtórzenia wewnątrz pliku; Wczytanych danych: "
-										+ removedInnerDoubleData.length + ";\r\n");
+										+ "\r\nUsunięto powtórzenia wewnątrz pliku;"
+										+ " Wczytanych danych: "
+										+ removedInnerDoubleData.length + ";\r\n" );
 						generateButton = GenerateTableModel.addButton(
 								firstFile.getCsvFileName(),
 								secondFile.getCsvFileName(),
 								removedInnerDoubleData,
-								firstFile.getCsvFileFirstRow());
+								firstFile.getCsvFileFirstRow() );
 
-						CsvReaderMain.getFrame().add(generateButton, BorderLayout.NORTH);
-						SwingUtilities.updateComponentTreeUI(CsvReaderMain
-								.getFrame());
+						CsvReaderMain.getFrame().add( generateButton, BorderLayout.NORTH );
+						SwingUtilities.updateComponentTreeUI( CsvReaderMain
+								.getFrame() );
 					}
 				}
 			});

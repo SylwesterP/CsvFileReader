@@ -9,6 +9,7 @@ import gui.CsvFrame;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.concurrent.TimeUnit;
@@ -71,77 +72,82 @@ public class CompareListener implements ActionListener {
 			generateThread = new Thread( new Runnable() {
 				
 				public void run() {
-					//search for double data
-					String[][] newTableModel = inform.searchForDoubleData(
-							firstFile, secondFile, firstFileColumn,
-							secondFileColumn );
-					while ( !inform.isDoneCompare() ) {
-						try {
-							TimeUnit.MICROSECONDS.sleep( 10 );
-						} catch ( InterruptedException e ) {
-							e.printStackTrace();
-						}
-					}
-					int pow1 = newTableModel.length
-							- firstFile.getCsvFileRows();
-					int inne = newTableModel.length;
-					
-					//remove double data in final file
-					String[][] removedInnerDoubleData = null;
-					if ( !newTableModel[ 0 ][ 0 ]
-							.equals( "Brak Danych do wyświetlenia" ) ) {
-						removedInnerDoubleData = inform.removeDoubleData(
-								newTableModel, true );
-						while (!inform.isDoneRemoveInnerDoubleData()) {
-							try {
-								TimeUnit.MICROSECONDS.sleep( 10 );
-							} catch (InterruptedException e) {
-								e.printStackTrace();
+					EventQueue.invokeLater(new Runnable(){
+						public void run(){
+							//search for double data
+							String[][] newTableModel = inform.searchForDoubleData(
+									firstFile, secondFile, firstFileColumn,
+									secondFileColumn );
+							while ( !inform.isDoneCompare() ) {
+								try {
+									TimeUnit.MICROSECONDS.sleep( 10 );
+								} catch ( InterruptedException e ) {
+									e.printStackTrace();
+								}
+							}
+							int pow1 = newTableModel.length
+									- firstFile.getCsvFileRows();
+							int inne = newTableModel.length;
+							
+							//remove double data in final file
+							String[][] removedInnerDoubleData = null;
+							if ( !newTableModel[ 0 ][ 0 ]
+									.equals( "Brak Danych do wyświetlenia" ) ) {
+								removedInnerDoubleData = inform.removeDoubleData(
+										newTableModel, true );
+								while (!inform.isDoneRemoveInnerDoubleData()) {
+									try {
+										TimeUnit.MICROSECONDS.sleep( 10 );
+									} catch (InterruptedException e) {
+										e.printStackTrace();
+									}
+								}
+							} else {
+								removedInnerDoubleData = newTableModel;
+
+							}
+							if ( removedInnerDoubleData[ 0 ][ 0 ]
+									.equals( "Brak Danych do wyświetlenia" ) ) {
+								// if selected file are the same its show dialog 
+								inne = 0;
+								CsvFrame.getCsvInsert().setForeground(
+										new Color(0, 100, 0));
+								CsvFrame.getCsvInsert().append(
+										"Wprowadzone plki są takie same\r\n");
+								generateButton = GenerateTableModel.addButton(
+										firstFile.getCsvFileName(),
+										secondFile.getCsvFileName(),
+										removedInnerDoubleData,
+										firstFile.getCsvFileFirstRow() );
+
+								CsvReaderMain.getFrame().add( generateButton, BorderLayout.NORTH );
+								SwingUtilities.updateComponentTreeUI( CsvReaderMain
+										.getFrame() );
+
+							}
+							else{
+								CsvFrame.getCsvInsert().setForeground( new Color( 0, 100, 0 ) );
+								CsvFrame.getCsvInsert()
+										.append( "Niepowtarzające: "
+												+ inne
+												+ "; Powtarzające się: "
+												+ pow1
+												+ "\r\nUsunięto powtórzenia wewnątrz pliku;"
+												+ " Wczytanych danych: "
+												+ removedInnerDoubleData.length + ";\r\n" );
+								generateButton = GenerateTableModel.addButton(
+										firstFile.getCsvFileName(),
+										secondFile.getCsvFileName(),
+										removedInnerDoubleData,
+										firstFile.getCsvFileFirstRow() );
+
+								CsvReaderMain.getFrame().add( generateButton, BorderLayout.NORTH );
+								SwingUtilities.updateComponentTreeUI( CsvReaderMain
+										.getFrame() );
 							}
 						}
-					} else {
-						removedInnerDoubleData = newTableModel;
-
-					}
-					if ( removedInnerDoubleData[ 0 ][ 0 ]
-							.equals( "Brak Danych do wyświetlenia" ) ) {
-						// if selected file are the same its show dialog 
-						inne = 0;
-						CsvFrame.getCsvInsert().setForeground(
-								new Color(0, 100, 0));
-						CsvFrame.getCsvInsert().append(
-								"Wprowadzone plki są takie same\r\n");
-						generateButton = GenerateTableModel.addButton(
-								firstFile.getCsvFileName(),
-								secondFile.getCsvFileName(),
-								removedInnerDoubleData,
-								firstFile.getCsvFileFirstRow() );
-
-						CsvReaderMain.getFrame().add( generateButton, BorderLayout.NORTH );
-						SwingUtilities.updateComponentTreeUI( CsvReaderMain
-								.getFrame() );
-
-					}
-					else{
-						CsvFrame.getCsvInsert().setForeground( new Color( 0, 100, 0 ) );
-						CsvFrame.getCsvInsert()
-								.append( "Niepowtarzające: "
-										+ inne
-										+ "; Powtarzające się: "
-										+ pow1
-										+ "\r\nUsunięto powtórzenia wewnątrz pliku;"
-										+ " Wczytanych danych: "
-										+ removedInnerDoubleData.length + ";\r\n" );
-						generateButton = GenerateTableModel.addButton(
-								firstFile.getCsvFileName(),
-								secondFile.getCsvFileName(),
-								removedInnerDoubleData,
-								firstFile.getCsvFileFirstRow() );
-
-						CsvReaderMain.getFrame().add( generateButton, BorderLayout.NORTH );
-						SwingUtilities.updateComponentTreeUI( CsvReaderMain
-								.getFrame() );
-					}
+					});
+					
 				}
 			});
 			generateThread.start();

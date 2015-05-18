@@ -11,6 +11,7 @@ import gui.TableRowNumber;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -63,31 +64,36 @@ public class GenerateTableModel {
 				Thread t = new Thread( new Runnable() {
 					
 					public void run() {
-						String[][] daneWczytane;
-						final String[] test = file.getCsvFileFirstRow();
-						if ( CsvChooser.selec) {
-							file.sortTableModel();
-							try {
-								while ( !file.isSortedTableModel() ) {
-									TimeUnit.SECONDS.sleep( 10 );
+						EventQueue.invokeLater(new Runnable(){
+							public void run(){
+								String[][] daneWczytane;
+								final String[] test = file.getCsvFileFirstRow();
+								if ( CsvChooser.selec) {
+									file.sortTableModel();
+									try {
+										while ( !file.isSortedTableModel() ) {
+											TimeUnit.SECONDS.sleep( 10 );
+										}
+									} catch ( InterruptedException e ) {
+										e.printStackTrace();
+									}
+									
+									Array2DOperations inform = new Array2DOperations();
+									daneWczytane = inform
+											.removeDoubleData( file
+													.getCsvFileTableModel() );
+									CsvFrame.getCsvInsert()
+											.append( "Usunięto powtórzenia wewnątrz pliku; "
+													+ "Wczytanych danych: "
+													+ daneWczytane.length + ";\r\n" );
+								} else {
+									daneWczytane = file.getCsvFileTableModel();
 								}
-							} catch ( InterruptedException e ) {
-								e.printStackTrace();
+								final String[][] tablicaDanych = daneWczytane;
+								generateTable( file.getCsvFileName(), tablicaDanych, test, gen );
 							}
-							
-							Array2DOperations inform = new Array2DOperations();
-							daneWczytane = inform
-									.removeDoubleData( file
-											.getCsvFileTableModel() );
-							CsvFrame.getCsvInsert()
-									.append( "Usunięto powtórzenia wewnątrz pliku; "
-											+ "Wczytanych danych: "
-											+ daneWczytane.length + ";\r\n" );
-						} else {
-							daneWczytane = file.getCsvFileTableModel();
-						}
-						final String[][] tablicaDanych = daneWczytane;
-						generateTable( file.getCsvFileName(), tablicaDanych, test, gen );
+						});
+						
 					}
 				});
 				t.start();
@@ -117,9 +123,12 @@ public class GenerateTableModel {
 				Thread t = new Thread(new Runnable(){
 					
 					public void run(){
-						
-						generateTable( firstFileName, niepowtarzalne, 
-								nameOfColumns, generate );
+						EventQueue.invokeLater(new Runnable(){
+							public void run(){
+								generateTable( firstFileName, niepowtarzalne, 
+										nameOfColumns, generate );
+							}
+						});												
 					}					
 				});
 				t.start();				
